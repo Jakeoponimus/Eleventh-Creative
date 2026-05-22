@@ -43,22 +43,18 @@ const marquee = [
 ];
 
 const workItems = [
-  { category: "BRAND", title: "UNRL x Timberwolves", subtitle: "Campaign", image: images.brand, videoUrl: "" },
-  { category: "EVENTS", title: "Rolling Loud CA", subtitle: "Weekend Recap", image: images.event, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "Rucci & Lefty Gunplay", subtitle: "Vamonos", image: images.music, videoUrl: "" },
-  { category: "BRAND", title: "UNRL x Williams Racing", subtitle: "Campaign", image: images.racing, videoUrl: "" },
-  { category: "EVENTS", title: "Halsey", subtitle: "Recap", image: images.concert, videoUrl: "" },
-  { category: "BRAND", title: "UNRL x United", subtitle: "Campaign", image: images.sports, videoUrl: "" },
-  { category: "EVENTS", title: "Turnstile", subtitle: "Recap", image: images.artist, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "Babyface Ray & Mozzy", subtitle: "Hood Cry", image: images.music, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "Derek Pope", subtitle: "Every Night", image: images.studio, videoUrl: "" },
-  { category: "SOCIAL", title: "Red Bull", subtitle: "Social Campaign", image: images.sports, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "Chloe Star", subtitle: "Happy Place", image: images.portrait, videoUrl: "" },
-  { category: "SOCIAL", title: "Nike", subtitle: "Content Series", image: images.portrait, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "Pardyalone", subtitle: "Why9x", image: images.artist, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "PROF", subtitle: "Bad Time Boy", image: images.studio, videoUrl: "" },
-  { category: "EVENTS", title: "Lollapalooza", subtitle: "Festival Coverage", image: images.event, videoUrl: "" },
-  { category: "MUSIC VIDEOS", title: "Guapdad 4000", subtitle: "Champagne Showers", image: images.music, videoUrl: "" }
+  { category: "BRAND", title: "UNRL x Timberwolves", subtitle: "Campaign", image: images.brand, videoUrl: "https://vimeo.com/1176827828?fl=tl&fe=ec" },
+  { category: "EVENTS", title: "Rolling Loud CA", subtitle: "Weekend Recap", image: images.event, videoUrl: "https://vimeo.com/1100187483?fl=tl&fe=ec" },
+  { category: "MUSIC VIDEOS", title: "Rucci & Lefty Gunplay", subtitle: "Vamonos", image: images.music, videoUrl: "https://www.youtube.com/watch?v=knj5dJNUgLk" },
+  { category: "BRAND", title: "UNRL x Williams Racing", subtitle: "Campaign", image: images.racing, videoUrl: "https://vimeo.com/1178312045?fl=tl&fe=ec" },
+  { category: "EVENTS", title: "Halsey", subtitle: "Recap", image: images.concert, videoUrl: "https://vimeo.com/1100227091?fl=tl&fe=ec" },
+  { category: "BRAND", title: "UNRL x United", subtitle: "Campaign", image: images.sports, videoUrl: "https://vimeo.com/1176828971?fl=tl&fe=ec" },
+  { category: "EVENTS", title: "Turnstile", subtitle: "Recap", image: images.artist, videoUrl: "https://vimeo.com/1100227659?fl=tl&fe=ec" },
+  { category: "MUSIC VIDEOS", title: "Babyface Ray & Mozzy", subtitle: "Hood Cry", image: images.music, videoUrl: "https://www.youtube.com/watch?v=8D1qZTkzhPI" },
+  { category: "MUSIC VIDEOS", title: "Derek Pope", subtitle: "Every Night", image: images.studio, videoUrl: "https://www.youtube.com/watch?v=bMQn5H2rKrc" },
+  { category: "MUSIC VIDEOS", title: "Chloe Star", subtitle: "Happy Place", image: images.portrait, videoUrl: "https://www.youtube.com/watch?v=2J4cF_2wmIs" },
+  { category: "MUSIC VIDEOS", title: "PROF", subtitle: "Bad Time Boy", image: images.studio, videoUrl: "https://www.youtube.com/watch?v=PnDSJBrRdaM" },
+  { category: "MUSIC VIDEOS", title: "Guapdad 4000", subtitle: "Champagne Showers", image: images.music, videoUrl: "https://www.youtube.com/watch?v=kPahjbg0PlM" }
 ];
 
 const stats = [
@@ -319,7 +315,7 @@ function homePage() {
 }
 
 function workPage() {
-  const filters = ["ALL", "MUSIC VIDEOS", "BRAND", "EVENTS", "SOCIAL"];
+  const filters = ["ALL", "MUSIC VIDEOS", "BRAND", "EVENTS"];
   const shown = activeFilter === "ALL" ? workItems : workItems.filter((item) => item.category === activeFilter);
   return `
     <main class="page">
