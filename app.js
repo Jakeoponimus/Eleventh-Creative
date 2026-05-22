@@ -60,8 +60,8 @@ const workItems = [
 const stats = [
   ["10+", "Years Active"],
   ["500M+", "Video Views"],
-  ["50+", "Brand Clients"],
-  ["100+", "Projects Delivered"]
+  ["Fast", "Built for Turnarounds"],
+  ["Trusted", "Across Industries"]
 ];
 
 const services = [
