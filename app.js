@@ -43,22 +43,22 @@ const marquee = [
 ];
 
 const workItems = [
-  { category: "BRAND", title: "UNRL x Timberwolves", subtitle: "Campaign", image: images.brand },
-  { category: "EVENTS", title: "Rolling Loud CA", subtitle: "Weekend Recap", image: images.event },
-  { category: "MUSIC VIDEOS", title: "Rucci & Lefty Gunplay", subtitle: "Vamonos", image: images.music },
-  { category: "BRAND", title: "UNRL x Williams Racing", subtitle: "Campaign", image: images.racing },
-  { category: "EVENTS", title: "Halsey", subtitle: "Recap", image: images.concert },
-  { category: "BRAND", title: "UNRL x United", subtitle: "Campaign", image: images.sports },
-  { category: "EVENTS", title: "Turnstile", subtitle: "Recap", image: images.artist },
-  { category: "MUSIC VIDEOS", title: "Babyface Ray & Mozzy", subtitle: "Hood Cry", image: images.music },
-  { category: "MUSIC VIDEOS", title: "Derek Pope", subtitle: "Every Night", image: images.studio },
-  { category: "SOCIAL", title: "Red Bull", subtitle: "Social Campaign", image: images.sports },
-  { category: "MUSIC VIDEOS", title: "Chloe Star", subtitle: "Happy Place", image: images.portrait },
-  { category: "SOCIAL", title: "Nike", subtitle: "Content Series", image: images.portrait },
-  { category: "MUSIC VIDEOS", title: "Pardyalone", subtitle: "Why9x", image: images.artist },
-  { category: "MUSIC VIDEOS", title: "PROF", subtitle: "Bad Time Boy", image: images.studio },
-  { category: "EVENTS", title: "Lollapalooza", subtitle: "Festival Coverage", image: images.event },
-  { category: "MUSIC VIDEOS", title: "Guapdad 4000", subtitle: "Champagne Showers", image: images.music }
+  { category: "BRAND", title: "UNRL x Timberwolves", subtitle: "Campaign", image: images.brand, videoUrl: "" },
+  { category: "EVENTS", title: "Rolling Loud CA", subtitle: "Weekend Recap", image: images.event, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "Rucci & Lefty Gunplay", subtitle: "Vamonos", image: images.music, videoUrl: "" },
+  { category: "BRAND", title: "UNRL x Williams Racing", subtitle: "Campaign", image: images.racing, videoUrl: "" },
+  { category: "EVENTS", title: "Halsey", subtitle: "Recap", image: images.concert, videoUrl: "" },
+  { category: "BRAND", title: "UNRL x United", subtitle: "Campaign", image: images.sports, videoUrl: "" },
+  { category: "EVENTS", title: "Turnstile", subtitle: "Recap", image: images.artist, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "Babyface Ray & Mozzy", subtitle: "Hood Cry", image: images.music, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "Derek Pope", subtitle: "Every Night", image: images.studio, videoUrl: "" },
+  { category: "SOCIAL", title: "Red Bull", subtitle: "Social Campaign", image: images.sports, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "Chloe Star", subtitle: "Happy Place", image: images.portrait, videoUrl: "" },
+  { category: "SOCIAL", title: "Nike", subtitle: "Content Series", image: images.portrait, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "Pardyalone", subtitle: "Why9x", image: images.artist, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "PROF", subtitle: "Bad Time Boy", image: images.studio, videoUrl: "" },
+  { category: "EVENTS", title: "Lollapalooza", subtitle: "Festival Coverage", image: images.event, videoUrl: "" },
+  { category: "MUSIC VIDEOS", title: "Guapdad 4000", subtitle: "Champagne Showers", image: images.music, videoUrl: "" }
 ];
 
 const stats = [
@@ -133,6 +133,37 @@ function esc(value) {
   })[char]);
 }
 
+function videoEmbedUrl(url) {
+  if (!url) return "";
+
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+
+    if (host === "youtu.be") {
+      return `https://www.youtube.com/embed/${parsed.pathname.slice(1)}`;
+    }
+
+    if (host.includes("youtube.com")) {
+      const id = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
+      return id ? `https://www.youtube.com/embed/${id}` : url;
+    }
+
+    if (host.includes("vimeo.com")) {
+      const id = parsed.pathname.split("/").filter(Boolean).pop();
+      return id ? `https://player.vimeo.com/video/${id}` : url;
+    }
+
+    return url;
+  } catch {
+    return url;
+  }
+}
+
+function isDirectVideo(url) {
+  return /\.(mp4|webm|mov)(\?.*)?$/i.test(url);
+}
+
 function path() {
   return window.location.pathname.replace(/\/$/, "") || "/";
 }
@@ -202,15 +233,27 @@ function footer() {
 }
 
 function projectCard(item, large = false) {
+  const index = workItems.indexOf(item);
+  const canPlay = Boolean(item.videoUrl);
   return `
-    <article class="project-card ${large ? "large" : ""}">
+    <article class="project-card ${large ? "large" : ""} ${canPlay ? "has-video" : ""}" ${canPlay ? `data-video-index="${index}" role="button" tabindex="0"` : ""}>
       <img src="${esc(item.image)}" alt="${esc(item.title)}" loading="${large ? "eager" : "lazy"}">
+      ${canPlay ? `<span class="play-badge">Play</span>` : ""}
       <div class="project-meta">
         <p class="eyebrow">${esc(item.category)}</p>
         <h3 class="display">${esc(item.title)}</h3>
         <p class="copy">${esc(item.subtitle)}</p>
       </div>
     </article>
+  `;
+}
+
+function videoModal() {
+  return `
+    <div class="video-modal" id="videoModal" aria-hidden="true">
+      <button class="video-close" type="button" id="videoClose" aria-label="Close video">Close</button>
+      <div class="video-frame" id="videoFrame"></div>
+    </div>
   `;
 }
 
@@ -517,6 +560,21 @@ function bindEvents() {
     });
   });
 
+  document.querySelectorAll("[data-video-index]").forEach((card) => {
+    card.addEventListener("click", () => openVideo(Number(card.dataset.videoIndex)));
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openVideo(Number(card.dataset.videoIndex));
+      }
+    });
+  });
+
+  document.getElementById("videoClose")?.addEventListener("click", closeVideo);
+  document.getElementById("videoModal")?.addEventListener("click", (event) => {
+    if (event.target.id === "videoModal") closeVideo();
+  });
+
   document.getElementById("contactForm")?.addEventListener("submit", (event) => {
     event.preventDefault();
     event.currentTarget.style.display = "none";
@@ -526,6 +584,32 @@ function bindEvents() {
   updateNav();
 }
 
+function openVideo(index) {
+  const item = workItems[index];
+  if (!item?.videoUrl) return;
+
+  const modal = document.getElementById("videoModal");
+  const frame = document.getElementById("videoFrame");
+  const source = videoEmbedUrl(item.videoUrl);
+
+  frame.innerHTML = isDirectVideo(source)
+    ? `<video src="${esc(source)}" controls autoplay playsinline></video>`
+    : `<iframe src="${esc(source)}" title="${esc(item.title)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("video-open");
+}
+
+function closeVideo() {
+  const modal = document.getElementById("videoModal");
+  const frame = document.getElementById("videoFrame");
+  if (!modal || !frame) return;
+
+  modal.setAttribute("aria-hidden", "true");
+  frame.innerHTML = "";
+  document.body.classList.remove("video-open");
+}
+
 function updateNav() {
   const navEl = document.getElementById("nav");
   if (!navEl) return;
@@ -533,7 +617,7 @@ function updateNav() {
 }
 
 function render() {
-  document.getElementById("app").innerHTML = `${nav()}${currentPage()}${footer()}`;
+  document.getElementById("app").innerHTML = `${nav()}${currentPage()}${footer()}${videoModal()}`;
   document.title = path() === "/" ? "Eleventh Creative" : `Eleventh Creative - ${path().slice(1)}`;
   bindEvents();
 }

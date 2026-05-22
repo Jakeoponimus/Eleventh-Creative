@@ -361,6 +361,15 @@ textarea {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.project-card.has-video {
+  cursor: pointer;
+}
+
+.project-card.has-video:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
 .project-card.large {
   aspect-ratio: 16 / 7;
 }
@@ -402,6 +411,79 @@ textarea {
   right: 1.35rem;
   bottom: 1.25rem;
   z-index: 1;
+}
+
+.play-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: rgba(23, 24, 29, 0.42);
+  color: var(--text);
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.video-open {
+  overflow: hidden;
+}
+
+.video-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: rgba(8, 9, 12, 0.9);
+}
+
+.video-modal[aria-hidden="false"] {
+  display: flex;
+}
+
+.video-frame {
+  width: min(100%, 1100px);
+  aspect-ratio: 16 / 9;
+  background: #000;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.video-frame iframe,
+.video-frame video {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.video-close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 101;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  padding: 0.7rem 0.9rem;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .project-meta h3 {
