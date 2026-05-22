@@ -1,5 +1,5 @@
 const images = {
-  hero: "https://d2xsxph8kpxj0f.cloudfront.net/310519663526064088/FvDUy7st27kockWrnmUs8K/hero-bg-THAMdtqLvzzpwc3tq5rKv5.webp",
+  hero: "/images/website-hero.jpg",
   event: "https://d2xsxph8kpxj0f.cloudfront.net/310519663526064088/FvDUy7st27kockWrnmUs8K/portfolio-event-8WLU5AGJoYb2GRfrziovXL.webp",
   brand: "https://d2xsxph8kpxj0f.cloudfront.net/310519663526064088/FvDUy7st27kockWrnmUs8K/portfolio-brand-8LnRFvzGFAnUQrjJ6cHwhR.webp",
   music: "https://d2xsxph8kpxj0f.cloudfront.net/310519663526064088/FvDUy7st27kockWrnmUs8K/portfolio-music-WBX9FCtR7zQnfC7GgpagsQ.webp",
