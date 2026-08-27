@@ -333,7 +333,6 @@ function homePage() {
           </div>
         </div>
       </section>
-      <section class="ticker"><div class="ticker-track">${tickerItems}</div></section>
       <section class="section">
         <div class="container">
           <div class="section-head">
@@ -349,6 +348,7 @@ function homePage() {
           </div>
         </div>
       </section>
+      <section class="ticker"><div class="ticker-track">${tickerItems}</div></section>
       <section class="section section-deep">
         <div class="container">
           <p class="eyebrow" style="margin-bottom: 2rem;">By the Numbers</p>
