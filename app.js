@@ -137,23 +137,71 @@ function videoEmbedUrl(url) {
     const host = parsed.hostname.replace(/^www\./, "");
 
     if (host === "youtu.be") {
-      return `https://www.youtube.com/embed/${parsed.pathname.slice(1)}`;
+      return `https://www.youtube.com/embed/${parsed.pathname.slice(1)}?autoplay=1`;
     }
 
     if (host.includes("youtube.com")) {
       const id = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
-      return id ? `https://www.youtube.com/embed/${id}` : url;
+      return id ? `https://www.youtube.com/embed/${id}?autoplay=1` : url;
     }
 
     if (host.includes("vimeo.com")) {
       const id = parsed.pathname.split("/").filter(Boolean).pop();
-      return id ? `https://player.vimeo.com/video/${id}` : url;
+      return id ? `https://player.vimeo.com/video/${id}?autoplay=1` : url;
     }
 
     return url;
   } catch {
     return url;
   }
+}
+
+// Vimeo/YouTube both expose an oEmbed endpoint that returns the real
+// width/height of the source video. Projects here aren't all 16:9 (several
+// are 5:4 or other ratios), so a fixed aspect-ratio box either letterboxes
+// or crops them badly. Fetch the true ratio and size the modal to match.
+function videoProvider(url) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    if (host === "youtu.be" || host.includes("youtube.com")) return "youtube";
+    if (host.includes("vimeo.com")) return "vimeo";
+  } catch {}
+  return null;
+}
+
+async function fetchVideoAspectRatio(url) {
+  const provider = videoProvider(url);
+  try {
+    let api = null;
+    if (provider === "vimeo") {
+      api = `https://vimeo.com/api/oembed.json?url=${encodeURIComponent(url)}`;
+    } else if (provider === "youtube") {
+      api = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+    }
+    if (!api) return 16 / 9;
+    const res = await fetch(api);
+    if (!res.ok) throw new Error("oembed request failed");
+    const data = await res.json();
+    if (data.width && data.height) return data.width / data.height;
+  } catch (e) {
+    /* fall back below */
+  }
+  return 16 / 9;
+}
+
+function sizeVideoFrameToRatio(ratio) {
+  const frame = document.getElementById("videoFrame");
+  if (!frame) return;
+  const maxW = Math.min(1100, window.innerWidth * 0.9);
+  const maxH = window.innerHeight - (window.innerWidth <= 700 ? 100 : 160);
+  let w = maxW;
+  let h = w / ratio;
+  if (h > maxH) {
+    h = maxH;
+    w = h * ratio;
+  }
+  frame.style.width = `${w}px`;
+  frame.style.height = `${h}px`;
 }
 
 function isDirectVideo(url) {
@@ -580,6 +628,8 @@ function bindEvents() {
   updateNav();
 }
 
+let currentVideoRatio = 16 / 9;
+
 function openVideo(index) {
   const item = workItems[index];
   if (!item?.videoUrl) return;
@@ -592,8 +642,14 @@ function openVideo(index) {
     ? `<video src="${esc(source)}" controls autoplay playsinline></video>`
     : `<iframe src="${esc(source)}" title="${esc(item.title)}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
 
+  sizeVideoFrameToRatio(16 / 9); // sensible default while the real ratio loads
   modal.setAttribute("aria-hidden", "false");
   document.body.classList.add("video-open");
+
+  fetchVideoAspectRatio(item.videoUrl).then((ratio) => {
+    currentVideoRatio = ratio;
+    sizeVideoFrameToRatio(ratio);
+  });
 }
 
 function closeVideo() {
@@ -603,8 +659,15 @@ function closeVideo() {
 
   modal.setAttribute("aria-hidden", "true");
   frame.innerHTML = "";
+  frame.style.width = "";
+  frame.style.height = "";
   document.body.classList.remove("video-open");
 }
+
+window.addEventListener("resize", () => {
+  const modal = document.getElementById("videoModal");
+  if (modal?.getAttribute("aria-hidden") === "false") sizeVideoFrameToRatio(currentVideoRatio);
+});
 
 function updateNav() {
   const navEl = document.getElementById("nav");
